@@ -27,7 +27,7 @@ public:
     virtual float get_torque(void) = 0;
 
     // Set current controller commanded value
-    virtual void set_command(float command) = 0;
+    virtual void set_command_torque(float command_torque) = 0;
 };
 
 // Struct of motor data to return every cycle on an update.
@@ -79,7 +79,7 @@ class MotorSlave : MotorInterface {
 		motor_(quad_a_pin, quad_b_pin, current_pin,
 				h_bridge_pwm_pin, h_bridge_in1_pin, h_bridge_in2_pin,
 				PWM_PERIOD, PID_CUR_P_GAIN, PID_CUR_D_GAIN, PID_CUR_I_GAIN),
-		position_(0), velocity_(0), current_(0), torque_(0), command_(0) {}
+		position_(0), velocity_(0), current_(0), torque_(0), command_torque_(0) {}
 
     // Update all state variables and apply command
 	void init(void);
@@ -91,7 +91,7 @@ class MotorSlave : MotorInterface {
     float get_current(void) { return current_; }
 
     // Set current controller commanded value
-    void set_command(float command) { command_ = command; }
+    void set_command_torque(float command_torque) { command_torque_ = command_torque; }
 
 private:
     Ticker ticker_;
@@ -102,7 +102,7 @@ private:
     float current_;
     float torque_;
 
-    float command_;
+    float command_torque_;
 };
 
 // Master stub class, does nothing but communicate.
@@ -112,7 +112,7 @@ class MotorMaster : MotorInterface {
     float velocity_;
     float current_;
     float torque_;
-    float command_;
+    float command_torque_;
 
     // Update all state variables and apply command
     void update(void);
@@ -123,7 +123,7 @@ class MotorMaster : MotorInterface {
     float get_current(void) { return current_; }
 
     // Set current controller commanded value
-    virtual void set_command(float command) { command_ = command; }
+    virtual void set_command_torque(float command_torque) { command_torque_ = command_torque; }
 };
 
 #endif

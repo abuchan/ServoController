@@ -1,7 +1,7 @@
 #include "Motor.h"
 
 // All variables updated here so sampling rates are constant.
-MotorData Motor::update(float command) {
+MotorData Motor::update(float torque_command) {
 	MotorData data_out;
 
 	// Sample the encoder and timer as close together as possible for accuracy
@@ -14,7 +14,7 @@ MotorData Motor::update(float command) {
 	data_out.velocity = (new_position - position_)/timer_elapsed;
 	data_out.current = current_sense_.get_current();
 
-    current_controller_.set_command(command);
+    current_controller_.set_command(torque_command);
     float output = current_controller_.command_torque(data_out.current);
     data_out.torque = current_controller_.current_torque;
     hbridge_.set_output(output);
@@ -28,7 +28,7 @@ void MotorSlave::init(void) {
 }
 
 void MotorSlave::update(void) {
-	MotorData data = motor_.update(command_);
+	MotorData data = motor_.update(command_torque_);
 	position_ = data.position;
 	velocity_ = data.velocity;
 	current_ = data.current;
