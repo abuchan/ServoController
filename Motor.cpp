@@ -1,44 +1,36 @@
 #include "Motor.h"
 
-Motor::Motor(
-    PinName pwm_pin, PinName min_1_pin, PinName min_2_pin, float pwm_period,
-    PinName current_pin,
-    PinName enc_a_pin, PinName enc_b_pin, 
-    float pid_cur_p_gain, float pid_cur_d_gain, float pid_cur_i_gain) : 
-    hbridge_(pwm_pin, min_1_pin, min_2_pin, pwm_period), 
-    current_sense_(current_pin), 
-    encoder_(enc_a_pin, enc_b_pin), 
-    current_controller_(pid_cur_p_gain, pid_cur_d_gain, pid_cur_i_gain) {
-    
-    timer_.start();
+// All variables updated here so sampling rates are constant.
+MotorData Motor::update(float command) {
+	MotorData data_out;
+
+	// Sample the encoder and timer as close together as possible for accuracy
+	float new_position = encoder_.get_position();
+	float timer_elapsed = timer_.read();
+	timer_.reset();
+
+	position_ = new_position;
+	data_out.position = position_;
+	data_out.velocity = (new_position - position_)/timer_elapsed;
+	data_out.current = current_sense_.get_current();
+
+    current_controller_.set_command(command);
+    float output = current_controller_.command_torque(data_out.current);
+    data_out.torque = current_controller_.current_torque;
+    hbridge_.set_output(output);
+
+    return data_out;
 }
 
-void Motor::update(void) {
-    this->velocity = this->get_velocity();
-    this->current = this->get_current();
-    current_controller_.set_command(this->command);
-    this->output = current_controller_.command_torque(this->current);
-    this->torque = current_controller_.current_torque;
-    this->hbridge_.set_output(this->output);
+
+void MotorSlave::init(void) {
+	ticker_.attach(this, &MotorSlave::update, PID_CUR_PERIOD);
 }
 
-float Motor::get_position(void) {
-    return encoder_.get_position();
-}
-
-// Implicitly updates position
-float Motor::get_velocity(void) {
-    float old_position = this->position;
-    this->position = this->get_position();
-    float velocity = (this->position - old_position)/timer_.read();
-    timer_.reset();
-    return velocity;
-}
-
-float Motor::get_current(void) {
-    return current_sense_.get_current();
-}
-
-void Motor::set_command(float command) {
-    this->command = command;
+void MotorSlave::update(void) {
+	MotorData data = motor_.update(command_);
+	position_ = data.position;
+	velocity_ = data.velocity;
+	current_ = data.current;
+	torque_ = data.torque;
 }
