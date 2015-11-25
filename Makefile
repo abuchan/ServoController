@@ -3,7 +3,7 @@
 
 GCC_BIN = 
 PROJECT = ServoController
-OBJECTS = ./mbed-src/targets/cmsis/TARGET_Freescale/TARGET_KLXX/TARGET_KL05Z/TOOLCHAIN_GCC_ARM/startup_MKL05Z4.o ./mbed-src/targets/cmsis/TARGET_Freescale/TARGET_KLXX/TARGET_KL05Z/cmsis_nvic.o ./mbed-src/targets/cmsis/TARGET_Freescale/TARGET_KLXX/TARGET_KL05Z/system_MKL05Z4.o ./mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX/analogin_api.o ./mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX/analogout_api.o ./mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX/gpio_api.o ./mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX/i2c_api.o ./mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX/pinmap.o ./mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX/port_api.o ./mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX/pwmout_api.o ./mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX/rtc_api.o ./mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX/sleep.o ./mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX/us_ticker.o ./mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX/TARGET_KL05Z/PeripheralPins.o ./mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX/TARGET_KL05Z/gpio_irq_api.o ./mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX/TARGET_KL05Z/mbed_overrides.o ./mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX/TARGET_KL05Z/serial_api.o ./mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX/TARGET_KL05Z/spi_api.o ./mbed-src/common/assert.o ./mbed-src/common/board.o ./mbed-src/common/error.o ./mbed-src/common/gpio.o ./mbed-src/common/lp_ticker_api.o ./mbed-src/common/mbed_interface.o ./mbed-src/common/pinmap_common.o ./mbed-src/common/rtc_time.o ./mbed-src/common/semihost_api.o ./mbed-src/common/ticker_api.o ./mbed-src/common/us_ticker_api.o ./mbed-src/common/wait_api.o ./main.o ./PID.o ./Encoder.o ./Motor.o ./CurrentSense.o ./HBridge.o ./QEI/QEI.o ./mbed-src/common/BusIn.o ./mbed-src/common/BusInOut.o ./mbed-src/common/BusOut.o ./mbed-src/common/CAN.o ./mbed-src/common/CallChain.o ./mbed-src/common/Ethernet.o ./mbed-src/common/FileBase.o ./mbed-src/common/FileLike.o ./mbed-src/common/FilePath.o ./mbed-src/common/FileSystemLike.o ./mbed-src/common/I2C.o ./mbed-src/common/I2CSlave.o ./mbed-src/common/InterruptIn.o ./mbed-src/common/InterruptManager.o ./mbed-src/common/LocalFileSystem.o ./mbed-src/common/RawSerial.o ./mbed-src/common/SPI.o ./mbed-src/common/SPISlave.o ./mbed-src/common/Serial.o ./mbed-src/common/SerialBase.o ./mbed-src/common/Stream.o ./mbed-src/common/Ticker.o ./mbed-src/common/Timeout.o ./mbed-src/common/Timer.o ./mbed-src/common/TimerEvent.o ./mbed-src/common/retarget.o 
+OBJECTS = ./mbed-src/targets/cmsis/TARGET_Freescale/TARGET_KLXX/TARGET_KL05Z/TOOLCHAIN_GCC_ARM/startup_MKL05Z4.o ./mbed-src/targets/cmsis/TARGET_Freescale/TARGET_KLXX/TARGET_KL05Z/cmsis_nvic.o ./mbed-src/targets/cmsis/TARGET_Freescale/TARGET_KLXX/TARGET_KL05Z/system_MKL05Z4.o ./mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX/analogin_api.o ./mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX/analogout_api.o ./mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX/gpio_api.o ./mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX/i2c_api.o ./mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX/pinmap.o ./mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX/port_api.o ./mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX/pwmout_api.o ./mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX/rtc_api.o ./mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX/sleep.o ./mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX/us_ticker.o ./mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX/TARGET_KL05Z/PeripheralPins.o ./mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX/TARGET_KL05Z/gpio_irq_api.o ./mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX/TARGET_KL05Z/mbed_overrides.o ./mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX/TARGET_KL05Z/serial_api.o ./mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX/TARGET_KL05Z/spi_api.o ./mbed-src/common/assert.o ./mbed-src/common/board.o ./mbed-src/common/error.o ./mbed-src/common/gpio.o ./mbed-src/common/lp_ticker_api.o ./mbed-src/common/mbed_interface.o ./mbed-src/common/pinmap_common.o ./mbed-src/common/rtc_time.o ./mbed-src/common/semihost_api.o ./mbed-src/common/ticker_api.o ./mbed-src/common/us_ticker_api.o ./mbed-src/common/wait_api.o ./PID.o ./Encoder.o ./Motor.o ./CurrentSense.o ./HBridge.o ./QEI/QEI.o ./mbed-src/common/BusIn.o ./mbed-src/common/BusInOut.o ./mbed-src/common/BusOut.o ./mbed-src/common/CAN.o ./mbed-src/common/CallChain.o ./mbed-src/common/Ethernet.o ./mbed-src/common/FileBase.o ./mbed-src/common/FileLike.o ./mbed-src/common/FilePath.o ./mbed-src/common/FileSystemLike.o ./mbed-src/common/I2C.o ./mbed-src/common/I2CSlave.o ./mbed-src/common/InterruptIn.o ./mbed-src/common/InterruptManager.o ./mbed-src/common/LocalFileSystem.o ./mbed-src/common/RawSerial.o ./mbed-src/common/SPI.o ./mbed-src/common/SPISlave.o ./mbed-src/common/Serial.o ./mbed-src/common/SerialBase.o ./mbed-src/common/Stream.o ./mbed-src/common/Ticker.o ./mbed-src/common/Timeout.o ./mbed-src/common/Timer.o ./mbed-src/common/TimerEvent.o ./mbed-src/common/retarget.o 
 SYS_OBJECTS = 
 INCLUDE_PATHS = -I. -I./QEI -I./mbed-src -I./mbed-src/api -I./mbed-src/hal -I./mbed-src/targets -I./mbed-src/targets/cmsis -I./mbed-src/targets/cmsis/TARGET_Freescale -I./mbed-src/targets/cmsis/TARGET_Freescale/TARGET_KLXX -I./mbed-src/targets/cmsis/TARGET_Freescale/TARGET_KLXX/TARGET_KL05Z -I./mbed-src/targets/cmsis/TARGET_Freescale/TARGET_KLXX/TARGET_KL05Z/TOOLCHAIN_GCC_ARM -I./mbed-src/targets/hal -I./mbed-src/targets/hal/TARGET_Freescale -I./mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX -I./mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX/TARGET_KL05Z -I./mbed-src/common 
 LIBRARY_PATHS = 
@@ -37,7 +37,7 @@ endif
 
 .PHONY: all clean lst size
 
-all: $(PROJECT).bin $(PROJECT).hex size
+all: main.hex CPU16.hex CPU18.hex CPU20.hex
 
 
 clean:
@@ -57,25 +57,18 @@ clean:
 .cpp.o:
 	$(CPP) $(CC_FLAGS) $(CC_SYMBOLS) -std=gnu++98 -fno-rtti $(INCLUDE_PATHS) -o $@ $<
 
-
-
-$(PROJECT).elf: $(OBJECTS) $(SYS_OBJECTS)
+%.elf: %.o $(OBJECTS) $(SYS_OBJECTS)
 	$(LD) $(LD_FLAGS) -T$(LINKER_SCRIPT) $(LIBRARY_PATHS) -o $@ $^ $(LIBRARIES) $(LD_SYS_LIBS) $(LIBRARIES) $(LD_SYS_LIBS)
 
 
-$(PROJECT).bin: $(PROJECT).elf
+%.bin: %.elf
 	$(OBJCOPY) -O binary $< $@
 
-$(PROJECT).hex: $(PROJECT).elf
+%.hex: %.elf
 	@$(OBJCOPY) -O ihex $< $@
 
-$(PROJECT).lst: $(PROJECT).elf
+%.lst: %.elf
 	@$(OBJDUMP) -Sdh $< > $@
-
-lst: $(PROJECT).lst
-
-size: $(PROJECT).elf
-	$(SIZE) $(PROJECT).elf
 
 DEPS = $(OBJECTS:.o=.d) $(SYS_OBJECTS:.o=.d)
 -include $(DEPS)
