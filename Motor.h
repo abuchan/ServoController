@@ -73,6 +73,7 @@ private:
 
 // Master slave class, wrapper around a Motor for convenience.
 class MotorSlave : MotorInterface {
+public:
 	MotorSlave(PinName quad_a_pin, PinName quad_b_pin, PinName current_pin,
 			PinName h_bridge_pwm_pin, PinName h_bridge_in1_pin,
 			PinName h_bridge_in2_pin) :
@@ -107,6 +108,7 @@ private:
 
 // Master stub class, does nothing but communicate.
 class MotorMaster : MotorInterface {
+public:
 	// TODO: proper encapsulation of state variables
     float position_;
     float velocity_;
@@ -123,7 +125,7 @@ class MotorMaster : MotorInterface {
     float get_current(void) { return current_; }
 
     // Set current controller commanded value
-    virtual void set_command_torque(float command_torque) { command_torque_ = command_torque; }
+    void set_command_torque(float command_torque) { command_torque_ = command_torque; }
 };
 
 #endif
