@@ -68,7 +68,7 @@ DigitalOut led2(LED2);
 DigitalOut led3(LED3);
 
 int main() {
-	pc.baud(115200);	// this actually doesn't do anything
+	pc.baud(115200);
 
     printf("Built " __DATE__ " " __TIME__ "\r\n");
 
