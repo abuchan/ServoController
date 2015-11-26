@@ -37,7 +37,7 @@ endif
 
 .PHONY: all clean lst size
 
-all: main.hex CPU16.hex CPU18.hex CPU20.hex
+all: main.hex CPU16.hex CPU18.hex CPU20.hex main.elf CPU16.elf CPU18.elf CPU20.elf
 
 
 clean:

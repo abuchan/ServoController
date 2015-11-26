@@ -44,9 +44,9 @@ struct MotorData {
 // and provides stateful layer over position / velocity.
 class Motor {
 public:
-	Motor(PinName quad_a_pin, PinName quad_b_pin, PinName current_pin,
-			PinName h_bridge_pwm_pin, PinName h_bridge_in1_pin,
-			PinName h_bridge_in2_pin,
+	Motor(PinName quad_a_pin, PinName quad_b_pin,
+			PinName h_bridge_in1_pin, PinName h_bridge_in2_pin,
+			PinName h_bridge_pwm_pin, PinName current_pin,
 			float pwm_period,
 			float current_p_gain, float current_d_gain, float current_i_gain) :
 		position_(0),
@@ -74,11 +74,12 @@ private:
 // Master slave class, wrapper around a Motor for convenience.
 class MotorSlave : MotorInterface {
 public:
-	MotorSlave(PinName quad_a_pin, PinName quad_b_pin, PinName current_pin,
-			PinName h_bridge_pwm_pin, PinName h_bridge_in1_pin,
-			PinName h_bridge_in2_pin) :
-		motor_(quad_a_pin, quad_b_pin, current_pin,
-				h_bridge_pwm_pin, h_bridge_in1_pin, h_bridge_in2_pin,
+	MotorSlave(PinName quad_a_pin, PinName quad_b_pin,
+			PinName h_bridge_in1_pin, PinName h_bridge_in2_pin,
+			PinName h_bridge_pwm_pin, PinName current_pin) :
+		motor_(quad_a_pin, quad_b_pin,
+				h_bridge_in1_pin, h_bridge_in2_pin,
+				h_bridge_pwm_pin, current_pin,
 				PWM_PERIOD, PID_CUR_P_GAIN, PID_CUR_D_GAIN, PID_CUR_I_GAIN),
 		position_(0), velocity_(0), current_(0), torque_(0), command_torque_(0) {}
 
