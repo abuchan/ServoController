@@ -51,6 +51,8 @@ int main() {
 
   CPU cpu;
   cpu.init();
+
+  float intensity = 0;
   while (true) {
     cpu.pull();
     i2c_success_led = cpu.push();
@@ -61,10 +63,11 @@ int main() {
     		(int)motor0.position_, (int)motor0.velocity_,
 			(int)motor1.position_, (int)motor1.velocity_);
 
-    wait(0.1);
-    motor0.command_torque_ += 0.05;
-    if (motor0.command_torque_ > 1) {
-    	motor0.command_torque_ = 0;
+    wait(0.01);
+    intensity += 0.01;
+    motor0.command_torque_ = intensity * intensity;
+    if (intensity > 1) {
+    	intensity = 0;
     }
   }
 }
