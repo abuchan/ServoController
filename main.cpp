@@ -39,13 +39,8 @@
 
 Serial pc(UART_TX_PIN, UART_RX_PIN);
 
-/*
- * ENC_A_PIN, ENC_B_PIN, MIN_1_PIN, MIN_2_PIN, PWM_PIN, CURRENT_PIN
- */
-Motor motor(ENC_A_PIN, ENC_B_PIN, MIN_1_PIN, MIN_2_PIN, PWM_PIN, CURRENT_PIN,
-    /*PWM_PIN, MIN_1_PIN, MIN_2_PIN,
-    CURRENT_PIN,
-    ENC_A_PIN, ENC_B_PIN,*/
+Motor motor(
+	ENC_A_PIN, ENC_B_PIN, MIN_1_PIN, MIN_2_PIN, PWM_PIN, CURRENT_PIN,
 	PWM_PERIOD, PID_CUR_P_GAIN, PID_CUR_D_GAIN, PID_CUR_I_GAIN
 );
 
@@ -73,6 +68,8 @@ DigitalOut led2(LED2);
 DigitalOut led3(LED3);
 
 int main() {
+	pc.baud(115200);	// this actually doesn't do anything
+
     printf("Built " __DATE__ " " __TIME__ "\r\n");
 
     led1 = 1;
