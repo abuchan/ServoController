@@ -110,6 +110,9 @@ private:
 // Master stub class, does nothing but communicate.
 class MotorMaster : MotorInterface {
 public:
+	MotorMaster() : position_(0), velocity_(0), current_(0),
+			torque_(0), command_torque_(0) {}
+
 	// TODO: proper encapsulation of state variables
     float position_;
     float velocity_;
