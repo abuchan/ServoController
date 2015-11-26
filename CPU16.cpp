@@ -36,13 +36,10 @@ public:
     pack_float(sptr, motor0.command_torque_);
     result = (master.write(18, snd_buf, 4) != 0);
     any_success |= (result == 0);
-    pc.printf("Tx1: %i    ", result);
     sptr = snd_buf;
     pack_float(sptr, motor1.command_torque_);
     result = (master.write(20, snd_buf, 4) != 0);
     any_success |= (result == 0);
-    pc.printf("Tx2: %i    ", result);
-    pc.printf("\r\n");
 
     return any_success;
   }
@@ -64,6 +61,10 @@ int main() {
     		(int)motor0.position_, (int)motor0.velocity_,
 			(int)motor1.position_, (int)motor1.velocity_);
 
-    //wait(0.01);
+    wait(0.1);
+    motor0.command_torque_ += 0.05;
+    if (motor0.command_torque_ > 1) {
+    	motor0.command_torque_ = 0;
+    }
   }
 }

@@ -1,6 +1,6 @@
 #include "CPU18.h"
 
-DigitalOut dbg_led(PTB10);
+PwmOut status_led(PTB10);
 
 class CPU : public AnyCPU {
 public:
@@ -29,14 +29,22 @@ public:
       case I2CSlave::WriteAddressed:
         slave.read(rcv_buf, 4);
         char* rptr = rcv_buf;
-        motor0.set_command_torque(unpack_float(rptr));
-        dbg_led = !dbg_led;
+        float result = unpack_float(rptr);
+        motor0.set_command_torque(result);
+        if (result > 1) {
+        	result = 1;
+        } else if (result < 0) {
+        	result = 0;
+        }
+        status_led = 1 - result;
         break;
     }
   }
 };
 
 int main() {
+  status_led.period_ms(1);
+
   CPU cpu;
   cpu.init();
   while (true) {
