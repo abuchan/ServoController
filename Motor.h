@@ -54,6 +54,7 @@ public:
 		hbridge_(h_bridge_pwm_pin, h_bridge_in1_pin, h_bridge_in2_pin, pwm_period),
 		current_sense_(current_pin),
 		current_controller_(current_p_gain, current_d_gain, current_i_gain) {
+		timer_.start();
 	}
 
 	// Run control loop and return new state variables.

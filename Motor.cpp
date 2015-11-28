@@ -5,13 +5,13 @@ MotorData Motor::update(float torque_command) {
 	MotorData data_out;
 
 	// Sample the encoder and timer as close together as possible for accuracy
-	float new_position = encoder_.get_position();
 	float timer_elapsed = timer_.read();
+	float new_position = encoder_.get_position();
 	timer_.reset();
 
+	data_out.velocity = (new_position - position_) / timer_elapsed;
 	position_ = new_position;
 	data_out.position = position_;
-	data_out.velocity = (new_position - position_)/timer_elapsed;
 	data_out.current = current_sense_.get_current();
 
     current_controller_.set_command(torque_command);

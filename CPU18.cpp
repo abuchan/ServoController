@@ -1,7 +1,9 @@
 #include "CPU18.h"
 
+Serial pc(PTB2, PTB1);
+
 PwmOut loop_led(PTB9);
-PwmOut command_led(PTB10);
+PwmOut command_led(PTA0);
 
 class CPU : public AnyCPU {
 public:
@@ -49,6 +51,8 @@ public:
 };
 
 int main() {
+  pc.baud(115200);
+
   command_led.period_ms(1);
 
   CPU cpu;
@@ -57,5 +61,6 @@ int main() {
     cpu.pull();
     cpu.push();
     loop_led = !loop_led;
+    pc.printf("%i\r\n", (int)motor0.get_velocity());
   }
 }
