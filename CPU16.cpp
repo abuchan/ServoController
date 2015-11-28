@@ -18,7 +18,7 @@ telemetry::Numeric<float> motor0_pos(telemetry_obj,
 telemetry::Numeric<float> motor0_vel(telemetry_obj,
   "motor0_vel", "Motor 0 Velocity", "?/s", 0);
 telemetry::Numeric<float> motor0_cmd_torque(telemetry_obj,
-  "motor0_cmd_torque", "Motor 0 Commanded Torque", "s", 0.1);
+  "motor0_cmd_torque", "Motor 0 Commanded Torque", "s", 0);
 
 DigitalOut dbg_led(PTB10);
 
