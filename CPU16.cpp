@@ -1,7 +1,24 @@
 #include "CPU16.h"
 #include "SOB.h"
+#include "MODSERIAL.h"
 
-Serial pc(PTB2, PTB1);
+#define __ARMCC_VERSION
+#include "telemetry/server-cpp/telemetry-mbed.h"
+
+Timer main_timer;
+MODSERIAL pc(PTB2, PTB1);
+
+telemetry::MbedHal telemetry_hal(pc);
+telemetry::Telemetry telemetry_obj(telemetry_hal);
+
+telemetry::Numeric<uint32_t> time_ms(telemetry_obj,
+  "time", "Time", "ms", 0);
+telemetry::Numeric<float> motor0_pos(telemetry_obj,
+  "motor0_pos", "Motor 0 Pos", "?", 0);
+telemetry::Numeric<float> motor0_vel(telemetry_obj,
+  "motor0_vel", "Motor 0 Velocity", "?/s", 0);
+telemetry::Numeric<float> motor0_cmd_torque(telemetry_obj,
+  "motor0_cmd_torque", "Motor 0 Commanded Torque", "s", 0.1);
 
 DigitalOut dbg_led(PTB10);
 
@@ -46,28 +63,28 @@ public:
 };
 
 int main() {
+  main_timer.start();
   pc.baud(115200);
   pc.printf(__FILE__ " built " __DATE__ " " __TIME__ "\r\n");
 
   CPU cpu;
   cpu.init();
 
-  float intensity = 0;
+  telemetry_obj.transmit_header();
+
   while (true) {
     cpu.pull();
     i2c_success_led = cpu.push();
 
     dbg_led = !dbg_led;
 
-    pc.printf("M0: P: %i, V: %i  --  M1: P: %i V: %i\r\n",
-    		(int)motor0.position_, (int)motor0.velocity_,
-			(int)motor1.position_, (int)motor1.velocity_);
+    time_ms = main_timer.read_ms();
+    motor0_pos = motor0.get_position();
+    motor0_vel = motor0.get_velocity();
+    motor0_cmd_torque = (float)motor0_cmd_torque;  // force telemetry update
+    telemetry_obj.do_io();
+    motor0.set_command_torque(motor0_cmd_torque);
 
     wait(0.01);
-    intensity += 0.01;
-    motor0.command_torque_ = intensity * intensity;
-    if (intensity > 1) {
-    	intensity = 0;
-    }
   }
 }
