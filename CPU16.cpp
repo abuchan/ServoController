@@ -24,20 +24,20 @@ telemetry::Telemetry telemetry_obj(telemetry_hal);
 telemetry::Numeric<uint32_t> time_ms(telemetry_obj,
   "time", "Time", "ms", 0);
 telemetry::Numeric<float> m0_setpoint(telemetry_obj,
-  "m0_setpoint", "Motor 0 Setpoint", "?pos", 0);
+  "m0_setpoint", "", "?pos", 0);
 telemetry::Numeric<float> m0_pos_kp(telemetry_obj,
-  "m0_kp", "Motor 0 Position Controller Kp", "??", 0);
+  "m0_kp", "", "??", 0);
 telemetry::Numeric<float> m0_pos_kd(telemetry_obj,
-  "m0_kd", "Motor 0 Position Controller Kp", "??", 0);
+  "m0_kd", "", "??", 0);
 telemetry::Numeric<float> m0_pos_ki(telemetry_obj,
-  "m0_ki", "Motor 0 Position Controller Kp", "??", 0);
+  "m0_ki", "", "??", 0);
 
 telemetry::Numeric<float> m0_pos(telemetry_obj,
-  "m0_pos", "Motor 0 Pos", "?pos", 0);
+  "m0_pos", "", "?pos", 0);
 telemetry::Numeric<float> m0_vel(telemetry_obj,
-  "m0_vel", "Motor 0 Velocity", "?pos/s", 0);
+  "m0_vel", "", "?pos/s", 0);
 telemetry::Numeric<float> m0_cmd_torque(telemetry_obj,
-  "m0_cmd_torque", "Motor 0 Commanded Torque", "?", 0);
+  "m0_cmd_torque", "", "?", 0);
 
 DigitalOut dbg_led(PTB10);
 
