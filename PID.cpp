@@ -1,9 +1,9 @@
 #include "PID.h"
 
 PIDController::PIDController(float p_gain, float d_gain, float i_gain) {
-    kp = p_gain;
-    kd = d_gain;
-    ki = i_gain;
+    kp_ = p_gain;
+    kd_ = d_gain;
+    ki_ = i_gain;
 
     command = 0.0;
     error = 0.0;
@@ -34,7 +34,7 @@ float PIDController::command_position(float current_position) {
         this->integral_error = 1.0;
     else if (this->integral_error < -1.0)
         this->integral_error = -1.0;
-    float output = (this->kp)*(this->error) + (this->kd)*(this->error - this->old_error) + (this->ki)*(this->integral_error);
+    float output = (this->kp_)*(this->error) + (this->kd_)*(this->error - this->old_error) + (this->ki_)*(this->integral_error);
     this->old_error = this->error;
     return output;
 }
@@ -69,7 +69,7 @@ float PIDController::command_torque(float current_current) {
 
     this->torque_integral_error += this->torque_error;
     
-    float output = 4.0*this->torque_command + this->kp*this->torque_error + this->ki*this->torque_integral_error;
+    float output = 4.0*this->torque_command + this->kp_*this->torque_error + this->ki_*this->torque_integral_error;
     
     // Set direction based on output
     if (output > 0){
