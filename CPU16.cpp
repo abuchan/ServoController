@@ -8,8 +8,11 @@
 #define PID_POS_PERIOD 0.005
 #define PID_POS_P_GAIN  0.5
 #define PID_POS_D_GAIN  10.0
-#define PID_POS_I_GAIN  0.1
-PIDController position_controller(
+#define PID_POS_I_GAIN  0
+PIDController m0_pid(
+    PID_POS_P_GAIN, PID_POS_D_GAIN, PID_POS_I_GAIN
+);
+PIDController m1_pid(
     PID_POS_P_GAIN, PID_POS_D_GAIN, PID_POS_I_GAIN
 );
 Ticker position_ticker;
@@ -23,14 +26,6 @@ telemetry::Telemetry telemetry_obj(telemetry_hal);
 
 telemetry::Numeric<uint32_t> time_ms(telemetry_obj,
   "time", "Time", "ms", 0);
-telemetry::Numeric<float> m0_setpoint(telemetry_obj,
-  "m0_setpoint", "", "?pos", 0);
-telemetry::Numeric<float> m0_pos_kp(telemetry_obj,
-  "m0_kp", "", "??", 0);
-telemetry::Numeric<float> m0_pos_kd(telemetry_obj,
-  "m0_kd", "", "??", 0);
-telemetry::Numeric<float> m0_pos_ki(telemetry_obj,
-  "m0_ki", "", "??", 0);
 
 telemetry::Numeric<float> m0_pos(telemetry_obj,
   "m0_pos", "", "?pos", 0);
@@ -38,10 +33,18 @@ telemetry::Numeric<float> m0_vel(telemetry_obj,
   "m0_vel", "", "?pos/s", 0);
 telemetry::Numeric<float> m0_cmd_torque(telemetry_obj,
   "m0_cmd_torque", "", "?", 0);
-
-DigitalOut dbg_led(PTB10);
-
+/*
+telemetry::Numeric<float> m1_pos(telemetry_obj,
+  "m1_pos", "", "?pos", 0);
+telemetry::Numeric<float> m1_vel(telemetry_obj,
+  "m1_vel", "", "?pos/s", 0);
+telemetry::Numeric<float> m1_cmd_torque(telemetry_obj,
+  "m1_cmd_torque", "", "?", 0);
+*/
 DigitalOut i2c_success_led(PTB8);
+
+DigitalOut button_led(PTB7);
+DigitalIn button_switch(PTB1);
 
 class CPU : public AnyCPU{
 public:
@@ -64,57 +67,69 @@ public:
     motor1.velocity_ = unpack_float(rptr);
   }
   bool push(void) {
-	bool any_success = false;
+	bool all_success = true;
 
     char* sptr;
     int result;
     sptr = snd_buf;
     pack_float(sptr, motor0.command_torque_);
     result = (master.write(18, snd_buf, 4) != 0);
-    any_success |= (result == 0);
+    all_success &= (result == 0);
     sptr = snd_buf;
     pack_float(sptr, motor1.command_torque_);
     result = (master.write(20, snd_buf, 4) != 0);
-    any_success |= (result == 0);
+    all_success &= (result == 0);
 
-    return any_success;
+    return all_success;
   }
 };
-
-//void update_position(void) {
-//    m0_cmd_torque = position_controller.command_position(m0_pos);
-//}
 
 int main() {
   main_timer.start();
   pc.baud(115200);
   pc.printf(__FILE__ " built " __DATE__ " " __TIME__ "\r\n");
 
+  Timer alive_timer;
+  alive_timer.start();
+  Timer telemetry_timer;
+  telemetry_timer.start();
+
   CPU cpu;
   cpu.init();
 
   telemetry_obj.transmit_header();
-//  position_ticker.attach(&update_position, PID_POS_PERIOD);
-  while (true) {
-    cpu.pull();
-    i2c_success_led = cpu.push();
 
-    dbg_led = !dbg_led;
+  while (true) {
+	if (alive_timer.read_ms() > 250) {
+	   	alive_timer.reset();
+	 	button_led = !button_led;
+	}
+
+    cpu.pull();
 
     time_ms = main_timer.read_ms();
-    m0_pos_kp = position_controller.get_kp();
-    m0_pos_kd = position_controller.get_kd();
-    m0_pos_ki = position_controller.get_ki();
+
+    m0_cmd_torque = m0_pid.command_position(motor0.get_position());
+    if (m0_cmd_torque > 0.25) {
+    	m0_cmd_torque = 0.25;
+    } else if (m0_cmd_torque < -0.25) {
+    	m0_cmd_torque = -0.25;
+    }
+    motor0.set_command_torque(m0_cmd_torque);
+
+    i2c_success_led = cpu.push();
+
     m0_pos = motor0.get_position();
     m0_vel = motor0.get_velocity();
-    m0_cmd_torque = (float)m0_cmd_torque;  // force telemetry update
-    m0_setpoint = (float)m0_setpoint;  // force telemetry update
+
     telemetry_obj.do_io();
-    motor0.set_command_torque(m0_cmd_torque);
-    position_controller.set_command(m0_setpoint);
-    position_controller.set_kp(m0_pos_kp);
-    position_controller.set_kd(m0_pos_kd);
-    position_controller.set_ki(m0_pos_ki);
-    m0_cmd_torque = position_controller.command_position(m0_pos);
+    telemetry_timer.reset();
+
+    // Hacky way to allow a single telemetry variable to have a different
+    // meaning for remote set.
+    if (m0_pos != motor0.get_position()) {
+        m0_pid.set_command(m0_pos);
+        pc.printf("Received");
+    }
   }
 }
