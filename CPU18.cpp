@@ -2,8 +2,10 @@
 
 Serial pc(PTB2, PTB1);
 
-PwmOut loop_led(PTB9);
-PwmOut command_led(PTA0);
+PwmOut command_led(PTB11);
+
+DigitalOut button_led(PTA7);
+DigitalIn button_switch(PTB10);
 
 class CPU : public AnyCPU {
 public:
@@ -53,14 +55,19 @@ public:
 int main() {
   pc.baud(115200);
 
+  Timer alive_timer;
+  alive_timer.start();
   command_led.period_ms(1);
+  command_led = 0.5;
 
   CPU cpu;
   cpu.init();
   while (true) {
     cpu.pull();
     cpu.push();
-    loop_led = !loop_led;
-    pc.printf("%i\r\n", (int)motor0.get_velocity());
+    if (alive_timer.read_ms() > 250) {
+    	alive_timer.reset();
+    	button_led = !button_led;
+    }
   }
 }
