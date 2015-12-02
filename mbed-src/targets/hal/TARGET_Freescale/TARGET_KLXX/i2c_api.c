@@ -54,6 +54,14 @@ void i2c_init(i2c_t *obj, PinName sda, PinName scl) {
     // set default frequency at 100k
     i2c_frequency(obj, 100000);
 
+    // Clock stretching timeout
+    obj->i2c->SMB &= ~I2C_SMB_TCKSEL_MASK;	// TCKSEL = 0, counter at Fi2c/64
+    obj->i2c->SLTH = 2;
+    obj->i2c->SLTL = 1;
+
+    // Max out the filter
+    obj->i2c->FLT |= I2C_FLT_FLT_MASK;
+
     // enable I2C interface
     obj->i2c->C1 |= 0x80;
 
