@@ -41,7 +41,7 @@ endif
 
 .PHONY: all clean lst size
 
-all: $(PROJECTS:=.bin) $(PROJECTS:=.elf)
+all: $(PROJECTS:=.bin) $(PROJECTS:=.elf) $(PROJECTS:=.lst)
 
 
 clean:
@@ -72,7 +72,7 @@ clean:
 	@$(OBJCOPY) -O ihex $< $@
 
 %.lst: %.elf
-	@$(OBJDUMP) -Sdh $< > $@
+	@$(OBJDUMP) -Sdhl $< > $@
 
 DEPS = $(OBJECTS:.o=.d) $(SYS_OBJECTS:.o=.d)
 -include $(DEPS)
