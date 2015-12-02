@@ -32,3 +32,7 @@ void MotorSlave::update(void) {
 		torque_ = data.torque;
 	}
 }
+
+void MotorSlave::timeout(void) {
+	command_torque_ = 0;
+}

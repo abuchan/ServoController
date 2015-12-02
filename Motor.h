@@ -89,6 +89,9 @@ public:
     // Update all state variables and apply command
     void update(void);
 
+    // Called when communication with master times out
+    void timeout(void);
+
     float get_position(void) { return position_; }
     float get_velocity(void) { return velocity_; }
     float get_torque(void) { return torque_; }

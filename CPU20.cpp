@@ -7,6 +7,8 @@ PwmOut command_led(PTB11);
 DigitalOut button_led(PTA7);
 DigitalIn button_switch(PTB10);
 
+Timer timeout_timer;
+
 class CPU : public AnyCPU {
 public:
   char snd_buf[4];
@@ -36,7 +38,8 @@ public:
     int o = slave.receive();
     switch (o) {
       case I2CSlave::WriteAddressed:
-        slave.read(rcv_buf, 4);
+    	bool any_failed = false;
+    	any_failed |= slave.read(rcv_buf, 4);
         char* rptr = rcv_buf;
         float result = unpack_float(rptr);
         motor1.set_command_torque(result);
@@ -47,6 +50,11 @@ public:
         	result = 1;
         }
         command_led = 1 - (result * result);
+
+        if (!any_failed) {
+        	timeout_timer.reset();
+        }
+
         break;
     }
   }
@@ -56,8 +64,10 @@ int main() {
   pc.baud(115200);
   pc.printf(__FILE__ " built " __DATE__ " " __TIME__ "\r\n");
 
+  timeout_timer.start();
   Timer alive_timer;
   alive_timer.start();
+
   command_led.period_ms(1);
   command_led = 0.5;
 
@@ -69,6 +79,9 @@ int main() {
     if (alive_timer.read_ms() > 250) {
     	alive_timer.reset();
     	button_led = !button_led;
+    }
+    if (timeout_timer.read_ms() > TIMEOUT_MS) {
+    	motor1.timeout();
     }
 	motor1.update();
   }
