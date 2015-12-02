@@ -5,7 +5,7 @@
 #define DEV_ADDR 16
 #define SDA_PIN PTB4
 #define SCL_PIN PTB3
-#define I2C_FREQ 400000
+#define I2C_FREQ 100000
 
 DigitalIn i2c_sda(SDA_PIN);
 DigitalIn i2c_scl(SCL_PIN);

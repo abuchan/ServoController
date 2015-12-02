@@ -15,8 +15,6 @@ PIDController m0_pid(
 PIDController m1_pid(
     PID_POS_P_GAIN, PID_POS_D_GAIN, PID_POS_I_GAIN
 );
-Ticker position_ticker;
-
 
 Timer main_timer;
 MODSERIAL pc(PTB2, PTB1);
@@ -33,15 +31,15 @@ telemetry::Numeric<float> m0_vel(telemetry_obj,
   "m0_vel", "", "?pos/s", 0);
 telemetry::Numeric<float> m0_cmd_torque(telemetry_obj,
   "m0_cmd_torque", "", "?", 0);
-/*
+
 telemetry::Numeric<float> m1_pos(telemetry_obj,
   "m1_pos", "", "?pos", 0);
 telemetry::Numeric<float> m1_vel(telemetry_obj,
   "m1_vel", "", "?pos/s", 0);
 telemetry::Numeric<float> m1_cmd_torque(telemetry_obj,
   "m1_cmd_torque", "", "?", 0);
-*/
-DigitalOut i2c_success_led(PTB8);
+
+DigitalOut i2c_success_led(PTB11);
 
 DigitalOut button_led(PTB7);
 DigitalIn button_switch(PTB1);
@@ -53,6 +51,7 @@ public:
   void init(void) {
 	i2c_sda.mode(PullUp);
 	i2c_scl.mode(PullUp);
+
     master.frequency(I2C_FREQ);
   }
   void pull(void) {
@@ -67,22 +66,23 @@ public:
     motor1.velocity_ = unpack_float(rptr);
   }
   bool push(void) {
-	bool all_success = true;
+	bool any_success = false;
 
     char* sptr;
     int result;
     sptr = snd_buf;
     pack_float(sptr, motor0.command_torque_);
     result = (master.write(18, snd_buf, 4) != 0);
-    all_success &= (result == 0);
+    any_success |= (result == 0);
     sptr = snd_buf;
     pack_float(sptr, motor1.command_torque_);
     result = (master.write(20, snd_buf, 4) != 0);
-    all_success &= (result == 0);
+    any_success |= (result == 0);
 
-    return all_success;
+    return any_success;
   }
 };
+
 
 int main() {
   main_timer.start();
@@ -100,27 +100,28 @@ int main() {
   telemetry_obj.transmit_header();
 
   while (true) {
-	if (alive_timer.read_ms() > 250) {
+	if (alive_timer.read_ms() > 125) {
 	   	alive_timer.reset();
 	 	button_led = !button_led;
 	}
+
+	master.frequency(I2C_FREQ);
 
     cpu.pull();
 
     time_ms = main_timer.read_ms();
 
     m0_cmd_torque = m0_pid.command_position(motor0.get_position());
-    if (m0_cmd_torque > 0.25) {
-    	m0_cmd_torque = 0.25;
-    } else if (m0_cmd_torque < -0.25) {
-    	m0_cmd_torque = -0.25;
-    }
     motor0.set_command_torque(m0_cmd_torque);
+    m1_cmd_torque = m1_pid.command_position(motor1.get_position());
+    motor1.set_command_torque(m1_cmd_torque);
 
-    i2c_success_led = cpu.push();
+    i2c_success_led = !cpu.push();
 
     m0_pos = motor0.get_position();
     m0_vel = motor0.get_velocity();
+    m1_pos = motor1.get_position();
+    m1_vel = motor1.get_velocity();
 
     telemetry_obj.do_io();
     telemetry_timer.reset();
@@ -129,7 +130,11 @@ int main() {
     // meaning for remote set.
     if (m0_pos != motor0.get_position()) {
         m0_pid.set_command(m0_pos);
-        pc.printf("Received");
+        pc.printf("M0RX\n");
+    }
+    if (m1_pos != motor1.get_position()) {
+        m1_pid.set_command(m1_pos);
+        pc.printf("M1RX\n");
     }
   }
 }
