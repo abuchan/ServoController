@@ -1,5 +1,9 @@
 #include "CPU16.h"
 #include "SOB.h"
+
+#define MODSERIAL_DEFAULT_RX_BUFFER_SIZE 32
+#define MODSERIAL_DEFAULT_TX_BUFFER_SIZE 64
+
 #include "MODSERIAL.h"
 
 #define __ARMCC_VERSION
