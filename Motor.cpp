@@ -22,15 +22,13 @@ MotorData Motor::update(float torque_command) {
     return data_out;
 }
 
-
-void MotorSlave::init(void) {
-	ticker_.attach(this, &MotorSlave::update, PID_CUR_PERIOD);
-}
-
 void MotorSlave::update(void) {
-	MotorData data = motor_.update(command_torque_);
-	position_ = data.position;
-	velocity_ = data.velocity;
-	current_ = data.current;
-	torque_ = data.torque;
+	if (loop_timer_.read() > PID_CUR_PERIOD) {
+		loop_timer_.reset();
+		MotorData data = motor_.update(command_torque_);
+		position_ = data.position;
+		velocity_ = data.velocity;
+		current_ = data.current;
+		torque_ = data.torque;
+	}
 }

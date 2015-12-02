@@ -82,10 +82,11 @@ public:
 				h_bridge_in1_pin, h_bridge_in2_pin,
 				h_bridge_pwm_pin, current_pin,
 				PWM_PERIOD, PID_CUR_P_GAIN, PID_CUR_D_GAIN, PID_CUR_I_GAIN),
-		position_(0), velocity_(0), current_(0), torque_(0), command_torque_(0) {}
+		position_(0), velocity_(0), current_(0), torque_(0), command_torque_(0) {
+		loop_timer_.start();
+	}
 
     // Update all state variables and apply command
-	void init(void);
     void update(void);
 
     float get_position(void) { return position_; }
@@ -97,7 +98,6 @@ public:
     void set_command_torque(float command_torque) { command_torque_ = command_torque; }
 
 private:
-    Ticker ticker_;
     Motor motor_;
 
     float position_;
@@ -106,6 +106,8 @@ private:
     float torque_;
 
     float command_torque_;
+
+    Timer loop_timer_;
 };
 
 // Master stub class, does nothing but communicate.

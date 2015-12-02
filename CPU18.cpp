@@ -12,13 +12,15 @@ public:
   char snd_buf[4];
   char rcv_buf[8];
   void init(void) {
+	i2c_sda.mode(PullUp);
+	i2c_scl.mode(PullUp);
+
     slave.frequency(I2C_FREQ);
     slave.address(DEV_ADDR);
-    motor0.init();
   }
   void pull(void) {
-	__disable_irq();
-    int i = slave.receive();
+	  int i = slave.receive();
+
     switch (i) {
       case I2CSlave::ReadAddressed:
         char* sptr = snd_buf;
@@ -27,12 +29,10 @@ public:
         slave.write(snd_buf, 8);
         break;
     }
-    __enable_irq();
   }
   void step(void) {
   }
   void push(void) {
-    __disable_irq();
     int o = slave.receive();
     switch (o) {
       case I2CSlave::WriteAddressed:
@@ -40,20 +40,21 @@ public:
         char* rptr = rcv_buf;
         float result = unpack_float(rptr);
         motor0.set_command_torque(result);
+        if (result < 0) {
+        	result = -result;
+        }
         if (result > 1) {
         	result = 1;
-        } else if (result < 0) {
-        	result = 0;
         }
-        command_led = 1 - result;
+        command_led = 1 - (result * result);
         break;
     }
-    __enable_irq();
   }
 };
 
 int main() {
   pc.baud(115200);
+  pc.printf(__FILE__ " built " __DATE__ " " __TIME__ "\r\n");
 
   Timer alive_timer;
   alive_timer.start();
@@ -69,5 +70,6 @@ int main() {
     	alive_timer.reset();
     	button_led = !button_led;
     }
+	motor0.update();
   }
 }
