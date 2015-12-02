@@ -11,9 +11,7 @@
 
 Timer main_timer;
 
-MODSERIAL pc(PTB2, PTB1);
-
-telemetry::MbedHal telemetry_hal(pc);
+telemetry::MbedHal telemetry_hal;
 telemetry::Telemetry telemetry_obj(telemetry_hal);
 
 telemetry::Numeric<uint32_t> time_ms(telemetry_obj,
@@ -114,8 +112,6 @@ void impedance_control(float th1, float d_th1, float th2, float d_th2,
 
 int main() {
   main_timer.start();
-  pc.baud(115200);
-  pc.puts(__FILE__ " built " __DATE__ " " __TIME__ "\r\n");
 
   Timer alive_timer;
   alive_timer.start();
@@ -123,6 +119,12 @@ int main() {
   CPU cpu;
   cpu.init();
 
+  // have to late-create MODSERIAL, otherwise RX breaks
+  MODSERIAL pc(PTB2, PTB1);
+  pc.baud(115200);
+  pc.puts(__FILE__ " built " __DATE__ " " __TIME__ "\r\n");
+
+  telemetry_hal.set_serial(pc);
   telemetry_obj.transmit_header();
 
   while (true) {
@@ -155,6 +157,7 @@ int main() {
     m1_vel = motor1.get_velocity();
 
     spring = (float)spring;  // force update telemetry
+
     telemetry_obj.do_io();
   }
 }
