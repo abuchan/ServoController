@@ -2,7 +2,7 @@
 # see http://mbed.org/handbook/Exporting-to-GCC-ARM-Embedded
 
 GCC_BIN = 
-PROJECTS = main CPU16 CPU18
+PROJECTS = main CPU16 CPU18 CPU20
 MODSERIAL_OBJECTS = ./FLUSH.o ./GETC.o ./INIT.o ./ISR_RX.o ./ISR_TX.o ./MODSERIAL.o ./MODSERIAL_IRQ_INFO.o ./PUTC.o ./RESIZE.o ./Device/MODSERIAL_KL05Z.o
 MODSERIAL_INCLUDES = ./Device .
 TELEMETRY_OBJECTS = ./telemetry.o ./telemetry-data.o ./telemetry-mbed-hal.o
