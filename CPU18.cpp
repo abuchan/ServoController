@@ -62,7 +62,7 @@ public:
 
 int main() {
   pc.baud(115200);
-  pc.printf(__FILE__ " built " __DATE__ " " __TIME__ "\r\n");
+  pc.puts(__FILE__ " built " __DATE__ " " __TIME__ "\r\n");
 
   timeout_timer.start();
   Timer alive_timer;
