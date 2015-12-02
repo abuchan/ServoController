@@ -9,18 +9,8 @@
 #define __ARMCC_VERSION
 #include "telemetry/server-cpp/telemetry-mbed.h"
 
-#define PID_POS_PERIOD 0.005
-#define PID_POS_P_GAIN  0.5
-#define PID_POS_D_GAIN  10.0
-#define PID_POS_I_GAIN  0
-PIDController m0_pid(
-    PID_POS_P_GAIN, PID_POS_D_GAIN, PID_POS_I_GAIN
-);
-PIDController m1_pid(
-    PID_POS_P_GAIN, PID_POS_D_GAIN, PID_POS_I_GAIN
-);
-
 Timer main_timer;
+
 MODSERIAL pc(PTB2, PTB1);
 
 telemetry::MbedHal telemetry_hal(pc);
@@ -28,6 +18,9 @@ telemetry::Telemetry telemetry_obj(telemetry_hal);
 
 telemetry::Numeric<uint32_t> time_ms(telemetry_obj,
   "time", "Time", "ms", 0);
+
+telemetry::Numeric<float> spring(telemetry_obj,
+  "spring", "Spring Constant", "?", 0.1);
 
 telemetry::Numeric<float> m0_pos(telemetry_obj,
   "m0_pos", "", "?pos", 0);
@@ -42,6 +35,10 @@ telemetry::Numeric<float> m1_vel(telemetry_obj,
   "m1_vel", "", "?pos/s", 0);
 telemetry::Numeric<float> m1_cmd_torque(telemetry_obj,
   "m1_cmd_torque", "", "?", 0);
+
+//Serial pc(PTB2, PTB1);
+//uint32_t time_ms;
+//float m0_pos, m0_vel, m0_cmd_torque, m1_pos, m1_vel, m1_cmd_torque;
 
 DigitalOut i2c_success_led(PTB11);
 
@@ -87,16 +84,41 @@ public:
   }
 };
 
+void impedance_control(float th1, float d_th1, float th2, float d_th2,
+		float* t_out_1, float* t_out_2){
+    // Input is motor position, velocity
+
+    float L = 0.12; // Arm Length
+    float k = spring; // Spring stiffness
+    float b = 0.0; // damping
+    float xp [2]; // Spring rest point
+    xp[0] = L; xp[1] = L; // Setpoint is 90/90 reference position. TODO: calibrate encoders, check direction of rotation on motors
+
+    float x [2]; // Current end-effector position
+    x[0] = L*(cosf(th1) + cosf(th2));
+    x[1] = L*(sinf(th1) + sinf(th2));
+
+    float v [2]; // End-effector velocity
+    v[0] = L*(-d_th1*sinf(th1)-d_th2*sinf(th2));
+    v[1] = L*(d_th1*cosf(th1)+d_th2*cosf(th2));
+
+    float f [2]; // Force
+    f[0] = -k*(x[0]-xp[0]) - b*v[0];
+    f[1] = -k*(x[1]-xp[1]) - b*v[1];
+    // Torque calculation
+    float det = 1/(L*sinf(th1+th2));
+
+    *t_out_1 = det*(-cosf(th2)*f[0] + cosf(th1)*f[1]);
+    *t_out_2 = det*(sinf(th2)*f[0] + sinf(th1)*f[1]);
+}
 
 int main() {
   main_timer.start();
   pc.baud(115200);
-  pc.printf(__FILE__ " built " __DATE__ " " __TIME__ "\r\n");
+  pc.puts(__FILE__ " built " __DATE__ " " __TIME__ "\r\n");
 
   Timer alive_timer;
   alive_timer.start();
-  Timer telemetry_timer;
-  telemetry_timer.start();
 
   CPU cpu;
   cpu.init();
@@ -115,9 +137,14 @@ int main() {
 
     time_ms = main_timer.read_ms();
 
-    m0_cmd_torque = m0_pid.command_position(motor0.get_position());
+    float t_out_1, t_out_2;
+    impedance_control(motor0.get_position(), motor0.get_velocity(),
+    		motor1.get_position(), motor1.get_velocity(),
+			&t_out_1, &t_out_2);
+
+    m0_cmd_torque = t_out_1;
     motor0.set_command_torque(m0_cmd_torque);
-    m1_cmd_torque = m1_pid.command_position(motor1.get_position());
+    m1_cmd_torque = t_out_2;
     motor1.set_command_torque(m1_cmd_torque);
 
     i2c_success_led = !cpu.push();
@@ -127,18 +154,7 @@ int main() {
     m1_pos = motor1.get_position();
     m1_vel = motor1.get_velocity();
 
+    spring = (float)spring;  // force update telemetry
     telemetry_obj.do_io();
-    telemetry_timer.reset();
-
-    // Hacky way to allow a single telemetry variable to have a different
-    // meaning for remote set.
-    if (m0_pos != motor0.get_position()) {
-        m0_pid.set_command(m0_pos);
-        pc.printf("M0RX\n");
-    }
-    if (m1_pos != motor1.get_position()) {
-        m1_pid.set_command(m1_pos);
-        pc.printf("M1RX\n");
-    }
   }
 }
