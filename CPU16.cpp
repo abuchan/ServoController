@@ -33,15 +33,11 @@ telemetry::Numeric<float> m0_pos(telemetry_obj,
   "m0_pos", "", "?pos", 0);
 telemetry::Numeric<float> m0_vel(telemetry_obj,
   "m0_vel", "", "?pos/s", 0);
-telemetry::Numeric<float> m0_cmd_torque(telemetry_obj,
-  "m0_cmd_torque", "", "?", 0);
 
 telemetry::Numeric<float> m1_pos(telemetry_obj,
   "m1_pos", "", "?pos", 0);
 telemetry::Numeric<float> m1_vel(telemetry_obj,
   "m1_vel", "", "?pos/s", 0);
-telemetry::Numeric<float> m1_cmd_torque(telemetry_obj,
-  "m1_cmd_torque", "", "?", 0);
 
 DigitalOut i2c_success_led(PTB11);
 
@@ -115,10 +111,8 @@ int main() {
 
     time_ms = main_timer.read_ms();
 
-    m0_cmd_torque = m0_pid.command_position(motor0.get_position());
-    motor0.set_command_torque(m0_cmd_torque);
-    m1_cmd_torque = m1_pid.command_position(motor1.get_position());
-    motor1.set_command_torque(m1_cmd_torque);
+    motor0.set_command_torque(0);
+    motor1.set_command_torque(0);
 
     i2c_success_led = !cpu.push();
 
@@ -129,16 +123,5 @@ int main() {
 
     telemetry_obj.do_io();
     telemetry_timer.reset();
-
-    // Hacky way to allow a single telemetry variable to have a different
-    // meaning for remote set.
-    if (m0_pos != motor0.get_position()) {
-        m0_pid.set_command(m0_pos);
-        pc.printf("M0RX\n");
-    }
-    if (m1_pos != motor1.get_position()) {
-        m1_pid.set_command(m1_pos);
-        pc.printf("M1RX\n");
-    }
   }
 }
