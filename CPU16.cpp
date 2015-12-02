@@ -92,6 +92,8 @@ void impedance_control(float th1, float d_th1, float th2, float d_th2,
     float xp [2]; // Spring rest point
     xp[0] = L; xp[1] = L; // Setpoint is 90/90 reference position. TODO: calibrate encoders, check direction of rotation on motors
 
+    th1 = th1 + 1.578f;
+
     float x [2]; // Current end-effector position
     x[0] = L*(cosf(th1) + cosf(th2));
     x[1] = L*(sinf(th1) + sinf(th2));
