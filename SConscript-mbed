@@ -1,0 +1,32 @@
+# TODO: submodule mbedmicro repo directly
+# TODO: autodetect target directories based on input target configuration
+
+Import('env')
+
+env = env.Clone()
+
+env.Append(CPPPATH=[
+    'mbed-src/api/',
+    'mbed-src/common/',
+    'mbed-src/hal/',
+    'mbed-src/targets/cmsis',
+    'mbed-src/targets/cmsis/TARGET_Freescale/TARGET_KLXX/TARGET_KL05Z',
+    'mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX',
+    'mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX/TARGET_KL05Z',
+])
+
+kl05z_cmsis_base = 'mbed-src/targets/cmsis/TARGET_Freescale/TARGET_KLXX/TARGET_KL05Z/'
+kl05z_cmsis_sources = Glob(kl05z_cmsis_base + '*.c') + Glob(kl05z_cmsis_base + "TOOLCHAIN_GCC_ARM/" + '*.S')
+
+kl05z_hal_base = 'mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX/TARGET_KL05Z/'
+kl05z_hal_sources = Glob(kl05z_hal_base + '*.c')
+
+klxx_hal_base = 'mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX/'
+klxx_hal_sources = Glob(klxx_hal_base + '*.c')
+
+mbed_base = 'mbed-src/common/'
+mbed_sources = Glob(mbed_base + '*.c') + Glob(mbed_base + '*.cpp')
+
+lib = env.StaticLibrary('mbed', mbed_sources + klxx_hal_sources + kl05z_cmsis_sources + kl05z_hal_sources)
+
+Return('lib')

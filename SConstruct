@@ -19,7 +19,6 @@ env.Append(CCFLAGS = [
     '-mthumb',
     '-c',
     '-g',
-    '-Wall', '-Wextra',
     '-fno-common',
     '-fno-exceptions',
     '-fmessage-length=0',
@@ -75,23 +74,8 @@ env.Append(CPPDEFINES = [
     'ARM_MATH_CM0PLUS',
 ])
 
-kl05z_cmsis_base = 'mbed-src/targets/cmsis/TARGET_Freescale/TARGET_KLXX/TARGET_KL05Z/'
-kl05z_cmsis_sources = Glob(kl05z_cmsis_base + '*.c') + Glob(kl05z_cmsis_base + "TOOLCHAIN_GCC_ARM/" + '*.S')
-
-kl05z_hal_base = 'mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX/TARGET_KL05Z/'
-kl05z_hal_sources = Glob(kl05z_hal_base + '*.c')
-
-klxx_hal_base = 'mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX/'
-klxx_hal_sources = Glob(klxx_hal_base + '*.c')
-
-mbed_base = 'mbed-src/common/'
-mbed_sources = Glob(mbed_base + '*.c') + Glob(mbed_base + '*.cpp')
-
-modserial_base = 'MODSERIAL/'
+modserial_base = '#/MODSERIAL/'
 modserial_sources = Glob(modserial_base + '*.cpp') + [modserial_base + 'Device/MODSERIAL_KL05Z.cpp']
-
-telemetry_base = 'telemetry/server-cpp/'
-telemetry_sources = Glob(telemetry_base + '*.cpp')
 
 top_sources = [
     'PID.cpp',
@@ -106,22 +90,35 @@ top_sources = [
 
 # include locations
 env['CPPPATH'] = [
-    'mbed-src/api/',
-    'mbed-src/common/',
-    'mbed-src/hal/',
-    'mbed-src/targets/cmsis',
-    'mbed-src/targets/cmsis/TARGET_Freescale/TARGET_KLXX/TARGET_KL05Z',
-    'mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX',
-    'mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX/TARGET_KL05Z',
-    'QEI',
+    '#/QEI',
     modserial_base, modserial_base + 'Device/',
-    telemetry_base,
     ]
+
+mbed_headers = [
+    '#mbed-src/api/',
+    '#mbed-src/common/',
+    '#mbed-src/hal/',
+    '#mbed-src/targets/cmsis',
+    '#mbed-src/targets/cmsis/TARGET_Freescale/TARGET_KLXX/TARGET_KL05Z',
+    '#mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX',
+    '#mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX/TARGET_KL05Z',
+]
+
+mbed = SConscript('SConscript-mbed', exports='env')
+
+telemetry_paths = mbed_headers
+telemetry = SConscript('telemetry/server-cpp/SConscript', exports=['env', 'telemetry_paths'])
+
+env.Append(CPPPATH=mbed_headers)
+
+# Only compile warnings when compiling top-level code (not libraries)
+env.Append(CCFLAGS = ['-Wall', '-Wextra'])
 
 # build everything
 prg = env.Program(
     target = 'main',
-    source = mbed_sources + klxx_hal_sources + kl05z_cmsis_sources + kl05z_hal_sources + modserial_sources + telemetry_sources + top_sources
+    source = modserial_sources + top_sources,
+    LIBS=[mbed, telemetry], LIBPATH='.'
 )
 
 # binary file builder
