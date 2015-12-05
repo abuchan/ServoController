@@ -76,102 +76,22 @@ env.Append(CPPDEFINES = [
 ])
 
 kl05z_cmsis_base = 'mbed-src/targets/cmsis/TARGET_Freescale/TARGET_KLXX/TARGET_KL05Z/'
-kl05z_cmsis_sources = [
-    'TOOLCHAIN_GCC_ARM/startup_MKL05Z4.S',
-    'cmsis_nvic.c',
-    'system_MKL05Z4.c',
-    ]
-kl05z_cmsis_sources = [kl05z_cmsis_base + x for x in kl05z_cmsis_sources]
+kl05z_cmsis_sources = Glob(kl05z_cmsis_base + '*.c') + Glob(kl05z_cmsis_base + "TOOLCHAIN_GCC_ARM/" + '*.S')
 
 kl05z_hal_base = 'mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX/TARGET_KL05Z/'
-kl05z_hal_sources = [
-    'PeripheralPins.c',
-    'gpio_irq_api.c',
-    'mbed_overrides.c',
-    'serial_api.c',
-    'spi_api.c',
-    ]
-kl05z_hal_sources = [kl05z_hal_base + x for x in kl05z_hal_sources]
+kl05z_hal_sources = Glob(kl05z_hal_base + '*.c')
 
 klxx_hal_base = 'mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX/'
-klxx_hal_sources = [
-    'analogin_api.c',
-    'analogout_api.c',
-    'gpio_api.c',
-    'i2c_api.c',
-    'pinmap.c',
-    'port_api.c',
-    'pwmout_api.c',
-    'rtc_api.c',
-    'sleep.c',
-    'us_ticker.c',
-    ]
-klxx_hal_sources = [klxx_hal_base + x for x in klxx_hal_sources]
+klxx_hal_sources = Glob(klxx_hal_base + '*.c')
 
 mbed_base = 'mbed-src/common/'
-mbed_sources = ['assert.c',
-    'board.c',
-    'error.c',
-    'gpio.c',
-    'lp_ticker_api.c',
-    'mbed_interface.c',
-    'pinmap_common.c',
-    'rtc_time.c',
-    'semihost_api.c',
-    'ticker_api.c',
-    'us_ticker_api.c',
-    'wait_api.c',
-    'BusIn.cpp',
-    'BusInOut.cpp',
-    'BusOut.cpp',
-    'CAN.cpp',
-    'CallChain.cpp',
-    'Ethernet.cpp',
-    'FileBase.cpp',
-    'FileLike.cpp',
-    'FilePath.cpp',
-    'FileSystemLike.cpp',
-    'I2C.cpp',
-    'I2CSlave.cpp',
-    'InterruptIn.cpp',
-    'InterruptManager.cpp',
-    'LocalFileSystem.cpp',
-    'RawSerial.cpp',
-    'SPI.cpp',
-    'SPISlave.cpp',
-    'Serial.cpp',
-    'SerialBase.cpp',
-    'Stream.cpp',
-    'Ticker.cpp',
-    'Timeout.cpp',
-    'Timer.cpp',
-    'TimerEvent.cpp',
-    'retarget.cpp',
-    ]
-mbed_sources = [mbed_base + x for x in mbed_sources]
+mbed_sources = Glob(mbed_base + '*.c') + Glob(mbed_base + '*.cpp')
 
 modserial_base = 'MODSERIAL/'
-modserial_sources = [
-    'FLUSH.cpp',
-    'GETC.cpp',
-    'INIT.cpp',
-    'ISR_RX.cpp',
-    'ISR_TX.cpp',
-    'MODSERIAL.cpp',
-    'MODSERIAL_IRQ_INFO.cpp',
-    'PUTC.cpp',
-    'RESIZE.cpp',
-    'Device/MODSERIAL_KL05Z.cpp',
-    ]
-modserial_sources = [modserial_base + x for x in modserial_sources]
+modserial_sources = Glob(modserial_base + '*.cpp') + [modserial_base + 'Device/MODSERIAL_KL05Z.cpp']
 
 telemetry_base = 'telemetry/server-cpp/'
-telemetry_sources = [
-    'telemetry.cpp',
-    'telemetry-data.cpp',
-    'telemetry-mbed-hal.cpp',
-    ]
-telemetry_sources = [telemetry_base + x for x in telemetry_sources]
+telemetry_sources = Glob(telemetry_base + '*.cpp')
 
 top_sources = [
     'PID.cpp',
