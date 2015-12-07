@@ -116,7 +116,7 @@ def top_elf(top_file):
   return env.Program(
     target = top_file,
     source = [top_file + '.cpp'],
-    # Library link order is important! Place "top-level" libaries first: as the
+    # Library link order is important! Place "top-level" libraries first: as the
     # linker processes libraries, it discards symbols which haven't been
     # referenced, leading to missing symbols in later libraries.
     LIBS=[telemetry, misc_libs, mbed_lib], LIBPATH='.'
