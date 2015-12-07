@@ -74,54 +74,65 @@ env.Append(CPPDEFINES = [
     'ARM_MATH_CM0PLUS',
 ])
 
-modserial_base = '#/MODSERIAL/'
-modserial_sources = Glob(modserial_base + '*.cpp') + [modserial_base + 'Device/MODSERIAL_KL05Z.cpp']
+# Build mbed library
+mbed_dir = '#mbed-src/'
+mbed_device_path = ['Freescale', 'KLXX', 'KL05Z']
+mbed_lib, mbed_paths = SConscript('SConscript-mbed', exports=['env', 'mbed_dir', 'mbed_device_path'])
+env.Append(CPPPATH=mbed_paths)
 
-top_sources = [
+# Add includes for mbed libraries.
+env.Append(CPPPATH=[
+    '#QEI/',
+    '#MODSERIAL/',
+    '#MODSERIAL/Device/',
+])
+misc_lib_sources = [
     'PID.cpp',
     'Encoder.cpp',
     'Motor.cpp',
     'CurrentSense.cpp',
     'HBridge.cpp',
     'QEI/QEI.cpp',
+    'MODSERIAL/FLUSH.cpp',
+    'MODSERIAL/GETC.cpp',
+    'MODSERIAL/INIT.cpp',
+    'MODSERIAL/ISR_RX.cpp',
+    'MODSERIAL/ISR_TX.cpp',
+    'MODSERIAL/MODSERIAL_IRQ_INFO.cpp',
+    'MODSERIAL/MODSERIAL.cpp',
+    'MODSERIAL/PUTC.cpp',
+    'MODSERIAL/RESIZE.cpp',
+    'MODSERIAL/Device/MODSERIAL_KL05Z.cpp',
+]
+misc_libs = env.StaticLibrary('misc_libs', source=misc_lib_sources)
 
-    'CPU16.cpp',
-    ]
-
-# include locations
-env['CPPPATH'] = [
-    '#/QEI',
-    modserial_base, modserial_base + 'Device/',
-    ]
-
-mbed_dir = '#mbed-src/'
-mbed_device_path = ['Freescale', 'KLXX', 'KL05Z']
-mbed_lib, mbed_paths = SConscript('SConscript-mbed', exports=['env', 'mbed_dir', 'mbed_device_path'])
-
-telemetry_paths = mbed_paths
-telemetry = SConscript('telemetry/server-cpp/SConscript', exports=['env', 'telemetry_paths'])
-
-env.Append(CPPPATH=mbed_paths)
+telemetry = SConscript('telemetry/server-cpp/SConscript', exports=['env'])
 
 # Only compile warnings when compiling top-level code (not libraries)
 env.Append(CCFLAGS = ['-Wall', '-Wextra'])
 
-# build everything
-prg = env.Program(
-    target = 'main',
-    source = modserial_sources + top_sources,
-    LIBS=[mbed_lib, telemetry], LIBPATH='.'
-)
+# Top-level build flow
+def top_elf(top_file):
+  return env.Program(
+    target = top_file,
+    source = [top_file + '.cpp'],
+    # Library link order is important! Place "top-level" libaries first: as the
+    # linker processes libraries, it discards symbols which haven't been
+    # referenced, leading to missing symbols in later libraries.
+    LIBS=[telemetry, misc_libs, mbed_lib], LIBPATH='.'
+  )
 
-# binary file builder
 def arm_generator(source, target, env, for_signature):
-    return '$OBJCOPY -O binary %s %s'%(source[0], target[0])
+  return '$OBJCOPY -O binary %s %s'%(source[0], target[0])
+
 env.Append(BUILDERS = {
-    'Objcopy': Builder(
-        generator=arm_generator,
-        suffix='.bin',
-        src_suffix='.elf'
-    )
+  'Objcopy': Builder(
+    generator=arm_generator,
+    suffix='.bin',
+    src_suffix='.elf'
+  )
 })
 
-env.Objcopy(prg)
+env.Objcopy(top_elf('CPU16'))
+env.Objcopy(top_elf('CPU18'))
+env.Objcopy(top_elf('CPU20'))

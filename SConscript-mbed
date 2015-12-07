@@ -49,7 +49,7 @@ for path_elt in mbed_device_path:
   device_path += 'TARGET_' + path_elt + '/'
   for device_header_path in device_header_paths:
     header_paths.append(device_header_path + device_path)
-# ... and wildcard the last path to catch funny things like TOOLCHAIN_GCC_ARM
+# ... and wildcard the final path to catch funny things like TOOLCHAIN_GCC_ARM
 device_path += '*/'
 for device_header_path in device_header_paths:
     header_paths.append(device_header_path + device_path)
