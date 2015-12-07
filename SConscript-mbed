@@ -1,32 +1,69 @@
 # TODO: submodule mbedmicro repo directly
 # TODO: autodetect target directories based on input target configuration
+# SConscript hierarchical build file for the mbed library.
+#
+# Provides a static library called 'mbed'.
+#
+# Usage:
+# mbed = SConscript('SConscript-mbed', exports=['env', 'mbed_dir', 'mbed_device']
+#
+# Inputs:
+# - env: properly configured C++ build environment for your platform (like
+#   env['CXX'] = 'arm-none-eabi-g++').
+# - mbed_dir: directory to the mbed library (like 'mbed/libraries/mbed/' if
+#   directly using the mbedmicro/mbed repository.
+# - mbed_device_path: path to the device drivers as a ordered list, like
+#   ['Freescale', 'KLXX', 'KL05Z'] for the FRDM-KL05Z board.
+#
+# Returns:
+# - a tuple:
+#   elt 0: a static library to be included in your program.
+#   elt 1: a list of header include directories.
 
-Import('env')
+Import('env', 'mbed_dir', 'mbed_device_path')
 
 env = env.Clone()
 
-env.Append(CPPPATH=[
-    'mbed-src/api/',
-    'mbed-src/common/',
-    'mbed-src/hal/',
-    'mbed-src/targets/cmsis',
-    'mbed-src/targets/cmsis/TARGET_Freescale/TARGET_KLXX/TARGET_KL05Z',
-    'mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX',
-    'mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX/TARGET_KL05Z',
-])
+# Header include paths for mbed, independent of device.
+header_paths = [
+    'api/',
+    'common/',
+    'hal/',
+    'targets/cmsis/',
+]
 
-kl05z_cmsis_base = 'mbed-src/targets/cmsis/TARGET_Freescale/TARGET_KLXX/TARGET_KL05Z/'
-kl05z_cmsis_sources = Glob(kl05z_cmsis_base + '*.c') + Glob(kl05z_cmsis_base + "TOOLCHAIN_GCC_ARM/" + '*.S')
+# Header include paths which need device-specific subpaths appended
+device_header_paths = [
+    'targets/cmsis/',
+    'targets/hal/',
+]
 
-kl05z_hal_base = 'mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX/TARGET_KL05Z/'
-kl05z_hal_sources = Glob(kl05z_hal_base + '*.c')
+# Prefix mbed_dir to header_paths
+header_paths = [mbed_dir + header_path for header_path in header_paths]
+device_header_paths = [mbed_dir + header_path for header_path in device_header_paths]
 
-klxx_hal_base = 'mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX/'
-klxx_hal_sources = Glob(klxx_hal_base + '*.c')
+# TODO: use os.path.join?
+# Generate all device-specific paths
+device_path = ''
+for path_elt in mbed_device_path:
+  device_path += 'TARGET_' + path_elt + '/'
+  for device_header_path in device_header_paths:
+    header_paths.append(device_header_path + device_path)
+# ... and wildcard the last path to catch funny things like TOOLCHAIN_GCC_ARM
+device_path += '*/'
+for device_header_path in device_header_paths:
+    header_paths.append(device_header_path + device_path)
 
-mbed_base = 'mbed-src/common/'
-mbed_sources = Glob(mbed_base + '*.c') + Glob(mbed_base + '*.cpp')
+env.Append(CPPPATH=header_paths)
 
-lib = env.StaticLibrary('mbed', mbed_sources + klxx_hal_sources + kl05z_cmsis_sources + kl05z_hal_sources)
+# Glob all sources in the header paths
+all_sources = []
+for header_path in header_paths:
+  all_sources.extend(Glob(header_path + '*.c'))
+  all_sources.extend(Glob(header_path + '*.cpp'))
+  all_sources.extend(Glob(header_path + '*.S'))
 
-Return('lib')
+lib = env.StaticLibrary('mbed', all_sources)
+rtn = (lib, header_paths)
+
+Return('rtn')

@@ -94,22 +94,14 @@ env['CPPPATH'] = [
     modserial_base, modserial_base + 'Device/',
     ]
 
-mbed_headers = [
-    '#mbed-src/api/',
-    '#mbed-src/common/',
-    '#mbed-src/hal/',
-    '#mbed-src/targets/cmsis',
-    '#mbed-src/targets/cmsis/TARGET_Freescale/TARGET_KLXX/TARGET_KL05Z',
-    '#mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX',
-    '#mbed-src/targets/hal/TARGET_Freescale/TARGET_KLXX/TARGET_KL05Z',
-]
+mbed_dir = '#mbed-src/'
+mbed_device_path = ['Freescale', 'KLXX', 'KL05Z']
+mbed_lib, mbed_paths = SConscript('SConscript-mbed', exports=['env', 'mbed_dir', 'mbed_device_path'])
 
-mbed = SConscript('SConscript-mbed', exports='env')
-
-telemetry_paths = mbed_headers
+telemetry_paths = mbed_paths
 telemetry = SConscript('telemetry/server-cpp/SConscript', exports=['env', 'telemetry_paths'])
 
-env.Append(CPPPATH=mbed_headers)
+env.Append(CPPPATH=mbed_paths)
 
 # Only compile warnings when compiling top-level code (not libraries)
 env.Append(CCFLAGS = ['-Wall', '-Wextra'])
@@ -118,7 +110,7 @@ env.Append(CCFLAGS = ['-Wall', '-Wextra'])
 prg = env.Program(
     target = 'main',
     source = modserial_sources + top_sources,
-    LIBS=[mbed, telemetry], LIBPATH='.'
+    LIBS=[mbed_lib, telemetry], LIBPATH='.'
 )
 
 # binary file builder
