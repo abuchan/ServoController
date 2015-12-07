@@ -1,5 +1,3 @@
-# TODO: submodule mbedmicro repo directly
-# TODO: autodetect target directories based on input target configuration
 # SConscript hierarchical build file for the mbed library.
 #
 # Provides a static library called 'mbed'.
@@ -11,7 +9,9 @@
 # - env: properly configured C++ build environment for your platform (like
 #   env['CXX'] = 'arm-none-eabi-g++').
 # - mbed_dir: directory to the mbed library (like 'mbed/libraries/mbed/' if
-#   directly using the mbedmicro/mbed repository.
+#   directly using the mbedmicro/mbed repository. This is provided because
+#   proper submoduling requires the SConscript file to be outside the mbed
+#   repository, unless mbed decides to include a SConscript officially.
 # - mbed_device_path: path to the device drivers as a ordered list, like
 #   ['Freescale', 'KLXX', 'KL05Z'] for the FRDM-KL05Z board.
 #
