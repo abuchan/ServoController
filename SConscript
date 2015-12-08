@@ -82,11 +82,12 @@ mbed_paths = ['#' + mbed_path for mbed_path in mbed_paths]
 env.Append(CPPPATH=mbed_paths)
 
 # Add includes for mbed libraries.
-env.Append(CPPPATH=[
-    '#QEI/',
-    '#MODSERIAL/',
-    '#MODSERIAL/Device/',
-])
+env.Append(CPPPATH=['#MODSERIAL/', '#MODSERIAL/Device/'])
+modserial_lib = env.StaticLibrary(
+  target='MODSERIAL',
+  source=Glob('MODSERIAL/*.cpp') + Glob('MODSERIAL/Device/*.cpp'))
+
+env.Append(CPPPATH=['#QEI/'])
 misc_lib_sources = [
     'PID.cpp',
     'Encoder.cpp',
@@ -94,16 +95,6 @@ misc_lib_sources = [
     'CurrentSense.cpp',
     'HBridge.cpp',
     'QEI/QEI.cpp',
-    'MODSERIAL/FLUSH.cpp',
-    'MODSERIAL/GETC.cpp',
-    'MODSERIAL/INIT.cpp',
-    'MODSERIAL/ISR_RX.cpp',
-    'MODSERIAL/ISR_TX.cpp',
-    'MODSERIAL/MODSERIAL_IRQ_INFO.cpp',
-    'MODSERIAL/MODSERIAL.cpp',
-    'MODSERIAL/PUTC.cpp',
-    'MODSERIAL/RESIZE.cpp',
-    'MODSERIAL/Device/MODSERIAL_KL05Z.cpp',
 ]
 misc_libs = env.StaticLibrary('misc_libs', source=misc_lib_sources)
 
@@ -120,7 +111,7 @@ def top_elf(top_file):
     # Library link order is important! Place "top-level" libraries first: as the
     # linker processes libraries, it discards symbols which haven't been
     # referenced, leading to missing symbols in later libraries.
-    LIBS=[telemetry, misc_libs, mbed_lib], LIBPATH='.'
+    LIBS=[telemetry, modserial_lib, misc_libs, mbed_lib], LIBPATH='.'
   )
 
 def arm_generator(source, target, env, for_signature):
