@@ -1,6 +1,7 @@
 # gnu arm toolchain must be already in system path
 
 import os
+
 env = Environment(ENV = os.environ)
 
 env['AR'] = 'arm-none-eabi-ar'
