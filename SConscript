@@ -76,8 +76,7 @@ env.Append(CPPDEFINES = [
 
 # Build mbed library
 mbed_dir = 'mbed-src/'
-mbed_device_path = ['TARGET_Freescale', 'TARGET_KLXX', 'TARGET_KL05Z', 'TOOLCHAIN_GCC_ARM']
-mbed_lib, mbed_paths = SConscript('SConscript-mbed', exports=['env', 'mbed_dir', 'mbed_device_path'])
+mbed_lib, mbed_paths = SConscript('SConscript-mbed', exports=['env', 'mbed_dir'])
 mbed_paths = ['#' + mbed_path for mbed_path in mbed_paths]
 env.Append(CPPPATH=mbed_paths)
 

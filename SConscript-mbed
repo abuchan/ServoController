@@ -3,11 +3,13 @@
 # Provides a static library called 'mbed'.
 #
 # Usage:
-# mbed = SConscript('SConscript-mbed', exports=['env', 'mbed_dir', 'mbed_device']
+# mbed = SConscript('SConscript-mbed', exports=['env', 'mbed_dir']
 #
 # Inputs:
 # - env: properly configured C++ build environment for your platform (like
-#   env['CXX'] = 'arm-none-eabi-g++').
+#   env['CXX'] = 'arm-none-eabi-g++') containing device-specific defines (like
+#   TARGET_Freescale, TARGET_KLXX, TARGET_KL25Z, TOOLCHAIN_GCC_ARM), which will
+#   be used to locate header directories.
 # - mbed_dir: directory to the mbed library (like 'mbed/libraries/mbed/' if
 #   directly using the mbedmicro/mbed repository. This is provided because
 #   proper submoduling requires the SConscript file to be outside the mbed
@@ -20,7 +22,9 @@
 #   elt 0: a static library to be included in your program.
 #   elt 1: a list of header include directories.
 
-Import('env', 'mbed_dir', 'mbed_device_path')
+import os
+
+Import('env', 'mbed_dir')
 
 env = env.Clone()
 
@@ -42,13 +46,24 @@ device_header_paths = [
 header_paths = [mbed_dir + header_path for header_path in header_paths]
 device_header_paths = [mbed_dir + header_path for header_path in device_header_paths]
 
-# TODO: use os.path.join?
-# Generate all device-specific paths
-device_path = ''
-for path_elt in mbed_device_path:
-  device_path += path_elt + '/'
-  for device_header_path in device_header_paths:
-    header_paths.append(device_header_path + device_path)
+# Generate all device-specific paths using CPPDEFINES
+defines = env['CPPDEFINES']
+
+def get_device_header_subpaths(device_header_path):
+  # Get all subdirs that are directories
+  subdirs = [node for node in Glob(device_header_path + "*") if os.path.isdir(node.abspath)]
+  # Get path component
+  subdirs = [os.path.split(node.path)[1] for node in subdirs]
+  # Append full path
+  subdirs = [os.path.join(device_header_path, node) + '/' for node in subdirs]
+  # Get sub-subdirectories
+  subsubdirs = []
+  for subdir in subdirs:
+    subsubdirs.extend(get_device_header_subpaths(subdir))
+  return subdirs + subsubdirs
+
+for device_header_path in device_header_paths:
+  header_paths.extend(get_device_header_subpaths(device_header_path))
 
 env.Append(CPPPATH=header_paths)
 
