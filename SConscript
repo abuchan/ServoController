@@ -11,6 +11,7 @@ env['CXX'] = 'arm-none-eabi-g++'
 env['LINK'] = 'arm-none-eabi-g++'                # predefined is 'arm-none-eabi-gcc'
 env['RANLIB'] = 'arm-none-eabi-ranlib'
 env['OBJCOPY'] = 'arm-none-eabi-objcopy'
+env['OBJDUMP'] = 'arm-none-eabi-objdump'
 env['PROGSUFFIX'] = '.elf'
 
 cpu = 'cortex-m0plus'
@@ -125,6 +126,33 @@ env.Append(BUILDERS = {
   )
 })
 
+def nm_size(source, target, env, for_signature):
+  return 'nm --line-numbers --print-size --size-sort --reverse-sort %s > %s'%(source[0], target[0])
+
+env.Append(BUILDERS = {
+  'SymbolsSize': Builder(
+    generator=nm_size,
+    suffix='.nm_size.txt',
+    src_suffix='.elf'
+  )
+})
+
+def objdump(source, target, env, for_signature):
+  return '$OBJDUMP -Sdhl %s > %s'%(source[0], target[0])
+
+env.Append(BUILDERS = {
+  'Objdump': Builder(
+    generator=objdump,
+    suffix='.dump.txt',
+    src_suffix='.elf'
+  )
+})
+
 env.Objcopy(top_elf('CPU16'))
 env.Objcopy(top_elf('CPU18'))
 env.Objcopy(top_elf('CPU20'))
+
+env.SymbolsSize('CPU16.elf')
+env.Objdump('CPU16.elf')
+env.SymbolsSize('CPU18.elf')
+env.Objdump('CPU18.elf')
